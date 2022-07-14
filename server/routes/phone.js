@@ -1,5 +1,4 @@
 const express = require('express');
-const routeGuard = require('./../middleware/route-guard');
 const router = express.Router();
 const Phone = require('./../models/phone');
 
