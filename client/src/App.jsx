@@ -1,20 +1,48 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import Navbar from './components/Navbar';
-import PhonePage from './pages/PhonePage';
-import PhoneCard from './components/PhoneCard';
+import { useState, useEffect } from 'react';
+import { listPhones, phoneDetail } from './services/phone';
+import PhoneDetail from './components/PhoneDetail';
+import './App.css';
 
-const App = () => {
+function App() {
+  const [phones, setPhones] = useState([]);
+  const [phone, setPhone] = useState(null);
+
+  useEffect(() => {
+    listPhones().then((data) => {
+      setInterval(() => {
+        setPhones(data.data);
+      }, 2000);
+    });
+  }, []);
+
+  const handleSelectPhone = (id) => {
+    phoneDetail(id).then((data) => {
+      setPhone(data.data);
+    });
+  };
+
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/phones' element={<PhonePage />} />
-        <Route path='/phone/:id' element={<PhoneCard />} />
-      </Routes>
-    </BrowserRouter>
+    <div className='App'>
+      <h1>Phones at Phone Cave</h1>
+
+      {(phones.length !== 0 && (
+        <ul>
+          {phones.map((item) => (
+            <li key={item.id}>
+              <h4
+                className={phone && (phone.id === item.id ? 'black' : '')}
+                onClick={() => handleSelectPhone(item.id)}
+              >
+                {item.name}
+              </h4>
+            </li>
+          ))}
+        </ul>
+      )) || <div id='loading'></div>}
+
+      {phone && <PhoneDetail model={phone} />}
+    </div>
   );
-};
+}
 
 export default App;
